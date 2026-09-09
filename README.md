@@ -12,6 +12,28 @@
 - **浏览历史** — 记录用户查看过的行程
 - **移动端适配** — 基于 Vant 4 组件库，开屏动画 + 底部 Tab 导航
 
+## 项目预览
+
+<table>
+  <tr>
+    <td align="center"><b>主页</b></td>
+    <td align="center"><b>AI 对话</b></td>
+    <td align="center"><b>行程规划</b></td>
+    <td align="center"><b>我的</b></td>
+  </tr>
+  <tr>
+    <td><img src="preview/home.jpg" alt="主页" width="200" /></td>
+    <td><img src="preview/chat.jpg" alt="AI对话" width="200" /></td>
+    <td><img src="preview/plan.jpg" alt="行程规划" width="200" /></td>
+    <td><img src="preview/profile.jpg" alt="我的" width="200" /></td>
+  </tr>
+</table>
+
+> 主页：轮播 Banner + 旅程规划表单 + 旅游攻略快捷入口 + 推荐景点
+> AI 对话：支持 SSE 流式输出，常见问题一键发送，实时旅游问答
+> 行程规划：AI 生成逐日行程 + 预算分配可视化 + 温馨提示
+> 我的：用户信息展示 + 订单/收藏/历史/优惠券等管理入口
+
 ## 技术栈
 
 | 层级 | 技术 |
