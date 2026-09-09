@@ -1,0 +1,45 @@
+HELP.md
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+### 本地私有配置（含 API Key 等密钥，禁止提交） ###
+application-local.yml
+**/application-local.yml
+application-secret.yml
+**/application-secret.yml
+
+### 免安装版 MySQL（体积大，禁止提交） ###
+mysql/
+mysql-*.zip
+start-mysql.bat
+stop-mysql.bat

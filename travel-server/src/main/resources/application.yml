@@ -1,0 +1,40 @@
+server:
+  port: 1200
+
+spring:
+  application:
+    name: travel-server
+  # 加载本地私有配置 application-local.yml（该文件已加入 .gitignore，不进版本库）
+  profiles:
+    active: local
+  # 数据源（目标数据库为 MySQL；本机若无 MySQL，可在 application-local.yml 中用 H2 覆盖）
+  datasource:
+    url: jdbc:mysql://localhost:3306/travel?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+
+# AI 对话配置
+travel:
+  ai:
+    # 提供方：siliconflow-硅基流动真实大模型；mock-内置规则引擎（无需 Key，离线可用）
+    provider: siliconflow
+    siliconflow:
+      # OpenAI 兼容接口地址
+      base-url: https://api.siliconflow.cn/v1
+      # API Key 严禁明文写入本文件（会进入 Git 历史）。
+      # 方式一（推荐）：设置环境变量 SILICONFLOW_API_KEY；
+      # 方式二：写入已被 gitignore 的 application-local.yml 中覆盖该项。
+      api-key: ${SILICONFLOW_API_KEY:}
+      # 模型 id（可在硅基流动控制台模型列表中替换为其他可用模型）
+      # deepseek-ai/DeepSeek-V3：综合质量好、稳定；Qwen/Qwen2.5-7B-Instruct：免费额度小模型
+      model: deepseek-ai/DeepSeek-V3
+      max-tokens: 1024
+      temperature: 0.7
