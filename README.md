@@ -43,18 +43,48 @@
 
 ## 项目预览
 
+> 截图取自当前版本：青绿/天青色系，**默认浅色主题**，设置中可切换深色。移动端视口 390×844。
+
 <table>
   <tr>
-    <td align="center"><b>主页</b></td>
-    <td align="center"><b>AI 对话</b></td>
-    <td align="center"><b>行程规划</b></td>
-    <td align="center"><b>我的</b></td>
+    <td align="center"><b>主页</b><br/><sub>开屏动画 · 可点击横幅 · 热门景点横向图片卡片 · 功能宫格</sub></td>
+    <td align="center"><b>目的地地图</b><br/><sub>城市切换 · 景点/美食/住宿标记 · 点击看详情</sub></td>
+    <td align="center"><b>AI 对话</b><br/><sub>SSE 流式输出 · Markdown 渲染为真实排版</sub></td>
   </tr>
   <tr>
-    <td><img src="preview/home.jpg" alt="主页" width="200" /></td>
-    <td><img src="preview/chat.jpg" alt="AI对话" width="200" /></td>
-    <td><img src="preview/plan.jpg" alt="行程规划" width="200" /></td>
-    <td><img src="preview/profile.jpg" alt="我的" width="200" /></td>
+    <td><img src="preview/home.jpg" alt="主页" width="220" /></td>
+    <td><img src="preview/map.jpg" alt="目的地地图" width="220" /></td>
+    <td><img src="preview/chat.jpg" alt="AI 对话" width="220" /></td>
+  </tr>
+  <tr>
+    <td align="center"><b>行程详情</b><br/><sub>逐日行程 · 预算分配 · 地图路线</sub></td>
+    <td align="center"><b>景点详情</b><br/><sub>门票/开放时间 · 用户评价 · 附近推荐</sub></td>
+    <td align="center"><b>足迹打卡</b><br/><sub>去过/想去/计划中 · 足迹统计</sub></td>
+  </tr>
+  <tr>
+    <td><img src="preview/trip.jpg" alt="行程详情" width="220" /></td>
+    <td><img src="preview/spot.jpg" alt="景点详情" width="220" /></td>
+    <td><img src="preview/footprint.jpg" alt="足迹打卡" width="220" /></td>
+  </tr>
+  <tr>
+    <td align="center"><b>旅行记账</b><br/><sub>分类饼图 · 每日柱状图 · 预算进度</sub></td>
+    <td align="center"><b>目的地天气</b><br/><sub>Open-Meteo 实时预报 · 未来 7 天</sub></td>
+    <td align="center"><b>汇率换算</b><br/><sub>实时汇率 · 人民币参考汇率表</sub></td>
+  </tr>
+  <tr>
+    <td><img src="preview/expense.jpg" alt="旅行记账" width="220" /></td>
+    <td><img src="preview/weather.jpg" alt="目的地天气" width="220" /></td>
+    <td><img src="preview/exchange.jpg" alt="汇率换算" width="220" /></td>
+  </tr>
+  <tr>
+    <td align="center"><b>我的</b><br/><sub>行程/足迹/记账/清单/签到/通知入口</sub></td>
+    <td align="center"><b>深色主题</b><br/><sub>设置中切换，支持跟随系统</sub></td>
+    <td align="center"><sub>&nbsp;</sub></td>
+  </tr>
+  <tr>
+    <td><img src="preview/profile.jpg" alt="我的" width="220" /></td>
+    <td><img src="preview/dark.jpg" alt="深色主题主页" width="220" /></td>
+    <td align="center"><sub>截图可替换：<br/><code>preview/*.jpg</code></sub></td>
   </tr>
 </table>
 
@@ -117,20 +147,24 @@
 
 ```
 Travel/
+├── preview/                     # README 预览截图（11 张，移动端 390×844）
 ├── travel/                      # 前端 Vue 3 项目
+│   ├── public/spots/            # 热门景点图片（按景点 ID 命名，缺失自动回退占位）
 │   ├── src/
 │   │   ├── api/                 # 接口封装（auth/chat/plan/trip/dest/checkin/review/social/
 │   │   │                        #   expense/packing/weather/exchange/collab/recommend/
 │   │   │                        #   profile/signin/notify/favorite/order）
 │   │   ├── components/          # 组件（MapContainer 地图、TripExport 导出、TripRefine 微调、
 │   │   │                        #   TripCollab 协作、TripCountdown 倒计时、ReviewSection 评价、
-│   │   │                        #   RecommendSection 推荐、FeatureEntry 功能宫格 等）
+│   │   │                        #   RecommendSection 推荐、ContentPopup 内容弹层、
+│   │   │                        #   ScenicSpotCard 景点卡片、FeatureEntry 功能宫格 等）
 │   │   ├── views/               # 页面（Home/MapView/DestinationLib/AttractionDetail/Footprint/
 │   │   │                        #   Nearby/PostList/PostDetail/PostPublish/Expense/Packing/
 │   │   │                        #   Weather/Exchange/MyTrips/TripDetail/CollabJoin/
 │   │   │                        #   ProfileEdit/SignIn/Notifications/PlanResult/Chat/...）
 │   │   ├── router/              # 路由配置 + 登录守卫
-│   │   ├── utils/               # auth token、coord 坐标转换、export 导出工具
+│   │   ├── utils/               # auth token、coord 坐标转换、export 导出、
+│   │   │                        #   theme 主题切换、aiText 富文本渲染
 │   │   └── App.vue              # 根组件 + 开屏动画 + Tab 导航
 │   └── vite.config.js           # Vite 配置（/api 代理到后端 1200 端口）
 │
