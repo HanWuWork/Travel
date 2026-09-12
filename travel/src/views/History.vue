@@ -15,7 +15,7 @@ const onBack = () => router.back()
 </script>
 
 <style scoped>
-.page { min-height: 100vh; background: #f7f8fa; }
+.page { min-height: 100vh; background: var(--bg); }
 .content { padding: 40px 16px; text-align: center; }
-.tip { margin-top: 8px; font-size: 13px; color: #969799; }
+.tip { margin-top: 8px; font-size: 13px; color: var(--text-2); }
 </style>

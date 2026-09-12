@@ -13,25 +13,37 @@
         :prev-next-margin="24"
         indicator-color="white"
       >
-        <van-swipe-item v-for="(img, idx) in bannerImages" :key="idx">
-          <Image
-            :src="img"
-            width="100%"
-            height="100%"
-            fit="cover"
-            radius="8px"
-          />
+        <van-swipe-item v-for="b in banners" :key="b.id" @click="goBanner(b)">
+          <div class="banner-slide" :class="{ 'banner-slide--fallback': bannerFailed[b.id] }">
+            <img
+              v-if="!bannerFailed[b.id]"
+              class="banner-slide__img"
+              :src="b.image"
+              :alt="b.title"
+              @error="onBannerImgError(b)"
+            />
+            <div class="banner-slide__mask">
+              <div class="banner-slide__text">
+                <div class="banner-slide__title">{{ b.title }}</div>
+                <div class="banner-slide__sub">{{ b.subtitle }}</div>
+              </div>
+              <span class="banner-slide__more">
+                查看详情
+                <Icon name="arrow" />
+              </span>
+            </div>
+          </div>
         </van-swipe-item>
       </van-swipe>
       <Icon
         name="arrow-left"
         class="swipe-arrow swipe-arrow--left"
-        @click="onPrev"
+        @click.stop="onPrev"
       />
       <Icon
         name="arrow"
         class="swipe-arrow swipe-arrow--right"
-        @click="onNext"
+        @click.stop="onNext"
       />
     </div>
 
@@ -41,26 +53,69 @@
       @edit-plan="onEditPlan"
     />
 
+    <TripCountdown />
+
+    <RecommendSection />
+
+    <FeatureEntry />
+
     <QuickEntryCard />
 
-    <ScenicSpotCard @select="onSelectSpot" />
+    <ScenicSpotCard :spots="hotSpots" @select="onSelectSpot" />
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { showToast, NoticeBar, Image, Icon } from 'vant'
+import { ref, reactive, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { showToast, NoticeBar, Icon } from 'vant'
 import JourneyCard from '../components/JourneyCard.vue'
 import QuickEntryCard from '../components/QuickEntryCard.vue'
 import ScenicSpotCard from '../components/ScenicSpotCard.vue'
+import FeatureEntry from '../components/FeatureEntry.vue'
+import TripCountdown from '../components/TripCountdown.vue'
+import RecommendSection from '../components/RecommendSection.vue'
+import { hotSpots as fetchHotSpots } from '../api/dest'
 
+const router = useRouter()
 const swipeRef = ref(null)
 
-const bannerImages = [
-  'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=%E6%9D%AD%E5%B7%9E%E8%A5%BF%E6%B9%96%E9%A3%8E%E6%99%AF%20%E6%B9%96%E5%85%89%E5%B1%B1%E8%89%B2%20%E8%93%9D%E5%A4%A9%E7%99%BD%E4%BA%91&image_size=landscape_16_9',
-  'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=%E5%8C%97%E4%BA%AC%E6%95%85%E5%AE%AB%E5%8D%9A%E7%89%A9%E9%99%A2%20%E5%8F%A4%E5%BB%BA%E7%AD%91%20%E7%BA%A2%E5%A2%99%E9%BB%84%E7%93%A6&image_size=landscape_16_9',
-  'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=%E5%BC%A0%E5%AE%B6%E7%95%8C%E5%9B%BD%E5%AE%B6%E6%A3%AE%E6%9E%97%E5%85%AC%E5%9B%AD%20%E5%A5%87%E5%B3%B0%E5%BC%82%E7%9F%B3%20%E4%BA%91%E9%9B%BE%E7%BC%95%E7%BB%95&image_size=landscape_16_9'
+/** 热门景点（来自后端真实数据，保证名称与点击后的详情一致） */
+const hotSpots = ref([])
+
+onMounted(async () => {
+  try {
+    const list = await fetchHotSpots(10)
+    hotSpots.value = (list || []).map((s) => ({
+      id: s.id,
+      name: s.name,
+      description: s.description,
+      cityName: s.cityName,
+      rating: s.rating != null ? Number(s.rating).toFixed(1) : '',
+      // 本地景区图片（public/spots/<id>.jpg）；缺失时组件会自动回退为渐变占位
+      image: `/spots/${s.id}.jpg`,
+      tag: s.rating != null && s.rating >= 4.8 ? '热门' : '推荐'
+    }))
+  } catch (e) {
+    hotSpots.value = []
+  }
+})
+
+/** 顶部轮播横幅：可点击跳转到对应景点详情（图片使用本地景区图，缺失自动回退） */
+const banners = [
+  { id: 16, title: '西湖风景名胜区', subtitle: '杭州 · 四季皆美的城市湖山', image: '/spots/16.jpg' },
+  { id: 1, title: '故宫博物院', subtitle: '北京 · 明清两代皇家宫殿', image: '/spots/1.jpg' },
+  { id: 9, title: '外滩', subtitle: '上海 · 万国建筑与江畔天际线', image: '/spots/9.jpg' }
 ]
+
+/** 横幅图片加载失败记录（回退为渐变底） */
+const bannerFailed = reactive({})
+const onBannerImgError = (b) => { bannerFailed[b.id] = true }
+
+/** 点击横幅 → 景点详情 */
+const goBanner = (b) => {
+  if (b && b.id) router.push(`/dest/attraction/${b.id}`)
+}
 
 const journeyData = ref({
   destination: '',
@@ -82,7 +137,11 @@ const onEditPlan = () => {
 }
 
 const onSelectSpot = (spot) => {
-  showToast(`查看${spot.name}`)
+  if (spot && spot.id) {
+    router.push(`/dest/attraction/${spot.id}`)
+  } else {
+    router.push('/dest')
+  }
 }
 </script>
 
@@ -101,6 +160,68 @@ const onSelectSpot = (spot) => {
   height: 140px;
   border-radius: 8px;
   overflow: hidden;
+}
+
+/* 轮播单页：图片 + 底部渐变遮罩 + 可点击提示 */
+.banner-slide {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  cursor: pointer;
+  background: linear-gradient(135deg, #2ba6d8, #04c489);
+}
+
+.banner-slide--fallback {
+  background: linear-gradient(135deg, #2ba6d8, #04c489);
+}
+
+.banner-slide__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.banner-slide__mask {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 20px 12px 9px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.72) 0%, rgba(0, 0, 0, 0.35) 55%, rgba(0, 0, 0, 0) 100%);
+  color: #fff;
+}
+
+.banner-slide__title {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.banner-slide__sub {
+  margin-top: 2px;
+  font-size: 11px;
+  opacity: 0.9;
+}
+
+.banner-slide__more {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(4px);
 }
 
 .swipe-arrow {

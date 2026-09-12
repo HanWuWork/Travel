@@ -123,6 +123,6 @@ const openSite = (url) => {
 
 .guide-name {
   font-size: 12px;
-  color: #323233;
+  color: var(--text);
 }
 </style>

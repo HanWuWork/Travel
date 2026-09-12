@@ -1,5 +1,7 @@
 package com.example.travelserver.vo.travel;
 
+import java.util.List;
+
 /**
  * 单日行程
  */
@@ -11,11 +13,14 @@ public class DayPlanVO {
     /** 当日主题 */
     private String title;
 
-    /** 当日行程描述 */
+    /** 当日行程描述（概述，兼容旧渲染） */
     private String description;
 
     /** 温馨提示 */
     private String tip;
+
+    /** 按时间段拆分（上午/中午/下午/晚上） */
+    private List<DayPeriodVO> periods;
 
     public DayPlanVO() {
     }
@@ -57,5 +62,13 @@ public class DayPlanVO {
 
     public void setTip(String tip) {
         this.tip = tip;
+    }
+
+    public List<DayPeriodVO> getPeriods() {
+        return periods;
+    }
+
+    public void setPeriods(List<DayPeriodVO> periods) {
+        this.periods = periods;
     }
 }

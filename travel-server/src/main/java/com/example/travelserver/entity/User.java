@@ -36,6 +36,18 @@ public class User {
     @Column(length = 255)
     private String avatar;
 
+    /** 个性签名 */
+    @Column(length = 200)
+    private String bio;
+
+    /** 常居地 */
+    @Column(length = 50)
+    private String city;
+
+    /** 积分（签到等获取）；历史数据可能为 null，按 0 处理 */
+    @Column
+    private Integer points;
+
     @Column(name = "create_time", updatable = false)
     private LocalDateTime createTime;
 
@@ -61,6 +73,12 @@ public class User {
     public void setPhone(String phone) { this.phone = phone; }
     public String getAvatar() { return avatar; }
     public void setAvatar(String avatar) { this.avatar = avatar; }
+    public String getBio() { return bio; }
+    public void setBio(String bio) { this.bio = bio; }
+    public String getCity() { return city; }
+    public void setCity(String city) { this.city = city; }
+    public Integer getPoints() { return points; }
+    public void setPoints(Integer points) { this.points = points; }
     public LocalDateTime getCreateTime() { return createTime; }
     public void setCreateTime(LocalDateTime createTime) { this.createTime = createTime; }
 }

@@ -26,8 +26,14 @@ public class AuthService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    /** token -> userId */
-    private final Map<String, Long> tokenStore = new ConcurrentHashMap<>();
+    /** Token 有效期（7 天） */
+    private static final long TOKEN_TTL_MS = 7L * 24 * 3600 * 1000;
+
+    /** token -> 会话信息（userId + 过期时间戳） */
+    private final Map<String, TokenEntry> tokenStore = new ConcurrentHashMap<>();
+
+    private record TokenEntry(Long userId, long expireAt) {
+    }
 
     public AuthService(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -49,6 +55,7 @@ public class AuthService {
                 ? request.getUsername() : request.getNickname();
         User user = new User(request.getUsername(),
                 passwordEncoder.encode(request.getPassword()), nickname);
+        user.setPoints(0);
         user = userRepository.save(user);
         return toVO(user);
     }
@@ -65,16 +72,24 @@ public class AuthService {
         }
 
         String token = UUID.randomUUID().toString().replace("-", "");
-        tokenStore.put(token, user.getId());
+        tokenStore.put(token, new TokenEntry(user.getId(), System.currentTimeMillis() + TOKEN_TTL_MS));
         return new LoginVO(token, toVO(user));
     }
 
-    /** 根据 token 获取 userId（未登录返回 null） */
+    /** 根据 token 获取 userId（未登录或已过期返回 null） */
     public Long getUserIdByToken(String token) {
         if (token == null || token.isBlank()) {
             return null;
         }
-        return tokenStore.get(token);
+        TokenEntry entry = tokenStore.get(token);
+        if (entry == null) {
+            return null;
+        }
+        if (System.currentTimeMillis() > entry.expireAt()) {
+            tokenStore.remove(token);
+            return null;
+        }
+        return entry.userId();
     }
 
     /** 登出，移除 token */
@@ -91,6 +106,9 @@ public class AuthService {
         vo.setNickname(user.getNickname());
         vo.setPhone(user.getPhone());
         vo.setAvatar(user.getAvatar());
+        vo.setBio(user.getBio());
+        vo.setCity(user.getCity());
+        vo.setPoints(user.getPoints() == null ? 0 : user.getPoints());
         vo.setCreateTime(user.getCreateTime());
         return vo;
     }

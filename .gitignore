@@ -24,6 +24,10 @@ travel/*.local
 travel-server/target/
 travel-server/.mvn/wrapper/maven-wrapper.jar
 
+# 用户上传文件（头像等运行时产物）
+travel-server/uploads/
+uploads/
+
 # ==================== 本地私有配置（含 API Key 等密钥，禁止提交） ====================
 **/application-local.yml
 **/application-secret.yml

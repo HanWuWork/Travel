@@ -17,7 +17,7 @@
     </div>
 
     <!-- 已登录：用户信息头部 -->
-    <div v-else class="profile-header">
+    <div v-else class="profile-header" @click="router.push('/profile-edit')">
       <van-image round width="64" height="64" :src="user.avatar || defaultAvatar">
         <template #loading>
           <van-loading />
@@ -25,12 +25,35 @@
       </van-image>
       <div class="profile-info">
         <h3>{{ user.nickname || user.username }}</h3>
-        <p>ID: {{ user.id }}</p>
+        <p v-if="user.bio">{{ user.bio }}</p>
+        <p v-else>点击编辑资料 ›</p>
+        <p class="points-line" v-if="user.points !== undefined">
+          <span class="points">{{ user.points }} 积分</span>
+          <span v-if="user.city" class="city"> · 常居 {{ user.city }}</span>
+        </p>
       </div>
     </div>
 
     <!-- 菜单：登录后可见 -->
     <template v-if="user">
+      <van-cell-group inset style="margin-top: 16px;">
+        <van-cell title="每日签到" icon="points" is-link @click="go('signin')">
+          <template #value>
+            <span class="cell-hint">赚积分</span>
+          </template>
+        </van-cell>
+        <van-cell title="消息通知" icon="bell" is-link @click="go('notifications')">
+          <template #value>
+            <span v-if="unread" class="badge">{{ unread > 99 ? '99+' : unread }}</span>
+          </template>
+        </van-cell>
+      </van-cell-group>
+      <van-cell-group inset style="margin-top: 16px;">
+        <van-cell title="我的行程" icon="calendar-o" is-link @click="go('trips')" />
+        <van-cell title="我的足迹" icon="location-o" is-link @click="go('footprint')" />
+        <van-cell title="旅行记账" icon="gold-coin-o" is-link @click="go('expense')" />
+        <van-cell title="打包清单" icon="checked" is-link @click="go('packing')" />
+      </van-cell-group>
       <van-cell-group inset style="margin-top: 16px;">
         <van-cell title="我的订单" icon="orders-o" is-link @click="goOrders" />
         <van-cell title="我的收藏" icon="star-o" is-link @click="goFavorites" />
@@ -53,11 +76,14 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { showConfirmDialog, showToast } from 'vant'
-import { getUser } from '../utils/auth'
+import { getUser, setUser } from '../utils/auth'
 import { logout } from '../api/auth'
+import { getProfile } from '../api/profile'
+import { unreadCount } from '../api/notify'
 
 const router = useRouter()
 const user = ref(null)
+const unread = ref(0)
 const defaultAvatar = '/avatar.png'
 
 const goLogin = () => router.push('/login')
@@ -72,13 +98,29 @@ const onLogout = async () => {
     await logout()
     showToast('已退出登录')
     user.value = null
+    unread.value = 0
   } catch (e) {
     // 用户取消
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
   user.value = getUser()
+  if (!user.value) return
+  // 拉取最新资料（含积分/签名/常居地）与未读通知数
+  try {
+    const p = await getProfile()
+    user.value = p
+    setUser(p)
+  } catch (e) {
+    // 忽略
+  }
+  try {
+    const res = await unreadCount()
+    unread.value = res?.count || 0
+  } catch (e) {
+    // 忽略
+  }
 })
 </script>
 
@@ -86,7 +128,7 @@ onMounted(() => {
 .profile {
   padding-bottom: 20px;
   min-height: 100vh;
-  background: #f7f8fa;
+  background: var(--bg);
 }
 
 /* 未登录头部 */
@@ -95,7 +137,7 @@ onMounted(() => {
   flex-direction: column;
   align-items: center;
   padding: 40px 16px 32px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: var(--grad-dark);
   color: white;
 }
 
@@ -130,7 +172,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   padding: 24px 16px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: var(--grad-dark);
   color: white;
 }
 
@@ -147,5 +189,36 @@ onMounted(() => {
   margin: 4px 0 0;
   font-size: 14px;
   opacity: 0.8;
+}
+
+.points-line {
+  font-size: 12px !important;
+}
+
+.points {
+  color: #7ff0cf;
+  font-weight: 600;
+}
+
+.city {
+  opacity: 0.9;
+}
+
+.cell-hint {
+  font-size: 12px;
+  color: var(--success);
+}
+
+.badge {
+  display: inline-block;
+  min-width: 18px;
+  height: 18px;
+  line-height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: #d81b3f;
+  color: #fff;
+  font-size: 11px;
+  text-align: center;
 }
 </style>

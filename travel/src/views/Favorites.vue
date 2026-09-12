@@ -13,7 +13,7 @@
         <div v-for="fav in favorites" :key="fav.id" class="fav-card">
           <img v-if="fav.image" :src="fav.image" class="fav-img" />
           <div v-else class="fav-img fav-img--placeholder">
-            <van-icon name="photo-o" size="28" color="#c8c9cc" />
+            <van-icon name="photo-o" size="28" color="#5a6165" />
           </div>
           <div class="fav-info">
             <div class="fav-title">{{ fav.title }}</div>
@@ -78,7 +78,7 @@ onMounted(loadFavorites)
 <style scoped>
 .favorites-page {
   min-height: 100vh;
-  background: #f7f8fa;
+  background: var(--bg);
 }
 
 .favorites-content {
@@ -101,7 +101,7 @@ onMounted(loadFavorites)
   display: flex;
   align-items: center;
   gap: 12px;
-  background: #fff;
+  background: var(--surface);
   border-radius: 10px;
   padding: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
@@ -113,7 +113,7 @@ onMounted(loadFavorites)
   border-radius: 8px;
   object-fit: cover;
   flex-shrink: 0;
-  background: #f2f3f5;
+  background: var(--line);
 }
 
 .fav-img--placeholder {
@@ -130,7 +130,7 @@ onMounted(loadFavorites)
 .fav-title {
   font-size: 15px;
   font-weight: 600;
-  color: #323233;
+  color: var(--text);
   margin-bottom: 4px;
   white-space: nowrap;
   overflow: hidden;
@@ -139,7 +139,7 @@ onMounted(loadFavorites)
 
 .fav-desc {
   font-size: 12px;
-  color: #969799;
+  color: var(--text-2);
   margin-bottom: 6px;
   white-space: nowrap;
   overflow: hidden;
@@ -150,13 +150,13 @@ onMounted(loadFavorites)
   display: flex;
   gap: 10px;
   font-size: 11px;
-  color: #c8c9cc;
+  color: var(--text-2);
 }
 
 .fav-type {
   padding: 1px 6px;
   border-radius: 4px;
-  background: #e8f3ff;
-  color: #1989fa;
+  background: var(--tint);
+  color: var(--brand-deep);
 }
 </style>

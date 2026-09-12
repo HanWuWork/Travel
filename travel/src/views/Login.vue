@@ -80,7 +80,7 @@ const goRegister = () => {
 <style scoped>
 .auth-page {
   min-height: 100vh;
-  background: #fff;
+  background: var(--surface);
 }
 
 .auth-form {
@@ -97,7 +97,7 @@ const goRegister = () => {
   height: 72px;
   margin: 0 auto 16px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: var(--grad-dark);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -106,13 +106,13 @@ const goRegister = () => {
 .auth-logo h2 {
   margin: 0 0 6px;
   font-size: 22px;
-  color: #323233;
+  color: var(--text);
 }
 
 .auth-logo p {
   margin: 0;
   font-size: 13px;
-  color: #969799;
+  color: var(--text-2);
 }
 
 .auth-actions {
@@ -124,11 +124,11 @@ const goRegister = () => {
   margin-top: 16px;
   text-align: center;
   font-size: 14px;
-  color: #646566;
+  color: var(--text-2);
 }
 
 .auth-link span {
-  color: #1989fa;
+  color: var(--brand-deep);
   cursor: pointer;
 }
 </style>

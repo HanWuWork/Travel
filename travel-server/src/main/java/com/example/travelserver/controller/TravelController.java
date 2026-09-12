@@ -1,5 +1,6 @@
 package com.example.travelserver.controller;
 
+import com.example.travelserver.dto.travel.RefineRequest;
 import com.example.travelserver.dto.travel.TravelPlanRequest;
 import com.example.travelserver.service.travel.TravelPlanService;
 import com.example.travelserver.vo.Result;
@@ -32,5 +33,13 @@ public class TravelController {
     @PostMapping("/plan")
     public Result<TravelPlanVO> plan(@RequestBody TravelPlanRequest request) {
         return Result.ok(travelPlanService.plan(request));
+    }
+
+    /**
+     * 行程微调：请求体 { "plan": {...当前行程...}, "instruction": "第二天太赶了" }
+     */
+    @PostMapping("/refine")
+    public Result<TravelPlanVO> refine(@RequestBody RefineRequest request) {
+        return Result.ok(travelPlanService.refine(request));
     }
 }

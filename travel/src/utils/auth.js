@@ -35,7 +35,7 @@ export function isLoggedIn() {
   return !!getToken()
 }
 
-/** 统一请求封装：自动携带 token，401 自动清除登录态 */
+/** 统一请求封装：自动携带 token、超时中断，401 自动清除登录态 */
 export async function request(url, options = {}) {
   const headers = { ...(options.headers || {}) }
   const token = getToken()
@@ -44,7 +44,22 @@ export async function request(url, options = {}) {
     headers['Content-Type'] = 'application/json'
   }
 
-  const response = await fetch(url, { ...options, headers })
+  // 超时控制：默认 20s，可在 options.timeout 覆盖，避免请求长时间挂起
+  const timeout = options.timeout || 20000
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), timeout)
+
+  let response
+  try {
+    response = await fetch(url, { ...options, headers, signal: controller.signal })
+  } catch (e) {
+    if (e.name === 'AbortError') {
+      throw new Error('请求超时，请稍后重试')
+    }
+    throw new Error('网络连接失败')
+  } finally {
+    clearTimeout(timer)
+  }
 
   // 401 未登录：清除本地登录态
   if (response.status === 401) {

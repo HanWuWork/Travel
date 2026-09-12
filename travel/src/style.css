@@ -1,3 +1,219 @@
+/* ============================================================
+ * AI 旅游助手 · 全局主题（青绿/天青色系，支持浅色 / 深色切换）
+ * 默认浅色（白天）主题；给 <html> 加 .dark 类切换为深色（黑色）主题。
+ * 色系取值来自设计参考截图采样：
+ *   主色 #04DC9C 青绿 / #4CCCF4 天青 / #BCE4FC 浅蓝
+ * ============================================================ */
+
+/* ==================== 浅色主题（默认 / 白天） ==================== */
+:root {
+  /* ---- 设计令牌 ---- */
+  --brand: #04c489;           /* 主色：青绿（浅色底上可读的稍深版本） */
+  --brand-2: #2ba6d8;         /* 次主色：天青 */
+  --brand-3: #6fc9ef;         /* 浅蓝 */
+  --brand-ink: #05121a;       /* 亮色渐变上的文字（近黑） */
+  --brand-deep: #067a58;      /* 浅色底上的强调文字（青绿，达 AA） */
+  --accent: #2ba6d8;
+  --accent-text: #1673a3;     /* 浅色底上的强调文字 */
+  --success: #067a58;
+  --danger: #d81b3f;
+  --danger-fill: #c73b40;
+
+  --ink: #0a0a0a;             /* 深色面（深色主视觉卡片、深色按钮） */
+  --ink-2: #141414;
+  --olive-900: #1c1c1c;
+  --olive-700: #242424;
+
+  --text: #10171a;            /* 主文字 */
+  --text-2: #56626a;          /* 次文字 */
+  --text-3: #5f6b71;          /* 弱文字 */
+  --text-4: #6e787d;          /* 更弱文字 */
+
+  --surface: #ffffff;         /* 卡片底 */
+  --surface-2: #f1f4f5;       /* 次级卡片底 */
+  --bg: #f4f7f8;              /* 页面底 */
+  --bg-2: #eef2f4;
+  --line: #e2e8ea;            /* 分隔线/描边 */
+  --tint: rgba(4, 196, 137, 0.12);
+  /* 标签色（随主题变化，供 JS 以 var() 传入 Vant Tag） */
+  --tag-attraction: #1f6fbf;
+  --tag-food: #b25a00;
+  --tag-hotel: #067a58;
+
+  --grad-brand: linear-gradient(135deg, #04dc9c 0%, #4cccf4 100%);
+  --grad-brand-3: linear-gradient(120deg, #04dc9c 0%, #4cccf4 55%, #bce4fc 100%);
+  /* 深色主视觉：带青蓝渐层，白字安全（两套主题一致） */
+  --grad-dark: linear-gradient(150deg, #0e3b3a 0%, #14486b 48%, #0b1420 100%);
+  --grad-deep: linear-gradient(150deg, #101a20 0%, #0a0a0a 100%);
+
+  --radius: 16px;
+  --radius-lg: 20px;
+  --radius-sm: 10px;
+  --shadow: 0 2px 10px rgba(16, 23, 26, 0.06);
+  --shadow-lg: 0 8px 24px rgba(16, 23, 26, 0.12);
+  --glow: 0 6px 20px rgba(4, 196, 137, 0.25);
+
+  /* ---- Vant 变量（浅色） ---- */
+  --van-primary-color: #067a58;
+  --van-danger-color: #d81b3f;
+  --van-success-color: #067a58;
+  --van-text-color: #10171a;
+  --van-text-color-2: #56626a;
+  --van-text-color-3: #6b757b;
+  --van-background: #f4f7f8;
+  --van-background-2: #ffffff;
+  --van-border-color: #e2e8ea;
+  --van-active-color: #eef2f4;
+
+  --van-nav-bar-background: #ffffff;
+  --van-nav-bar-title-text-color: #10171a;
+  --van-nav-bar-icon-color: #10171a;
+  --van-nav-bar-text-color: #067a58;
+  --van-nav-bar-height: 48px;
+
+  --van-tabbar-background: #ffffff;
+  --van-tabbar-item-text-color: #56626a;
+  --van-tabbar-item-active-color: #067a58;
+  --van-tabbar-item-active-background: transparent;
+
+  --van-button-primary-background: #04c489;
+  --van-button-primary-border-color: #04c489;
+  --van-button-primary-color: #05121a;
+  --van-button-default-color: #10171a;
+  --van-button-default-background: #ffffff;
+  --van-button-default-border-color: #d5dde0;
+  --van-button-danger-background: #c73b40;
+  --van-button-danger-border-color: #c73b40;
+  --van-button-round-radius: 999px;
+  --van-button-normal-font-weight: 600;
+  --van-button-plain-background: transparent;
+
+  --van-cell-background: #ffffff;
+  --van-cell-text-color: #10171a;
+  --van-cell-value-color: #56626a;
+  --van-cell-border-color: #eef2f4;
+  --van-cell-group-inset-radius: 16px;
+  --van-field-label-color: #56626a;
+  --van-field-input-text-color: #10171a;
+  --van-field-placeholder-text-color: #9aa4a9;
+  --van-field-word-limit-color: #6b757b;
+
+  --van-popup-background: #ffffff;
+  --van-popup-round-radius: 20px;
+  --van-search-background: transparent;
+  --van-search-content-background: #eef2f4;
+  --van-loading-spinner-color: #067a58;
+  --van-badge-background: #d81b3f;
+  --van-rate-icon-full-color: #f0a90a;
+  --van-tag-primary-color: #067a58;
+  --van-tag-default-color: #eef2f4;
+  --van-switch-on-background: #04c489;
+  --van-calendar-selected-day-background: #04c489;
+  --van-picker-confirm-action-color: #067a58;
+  --van-notice-bar-background: #eef8f5;
+  --van-notice-bar-text-color: #067a58;
+  --van-notice-bar-left-icon-color: #067a58;
+  --van-notice-bar-height: 34px;
+  --van-dialog-background: #ffffff;
+  --van-toast-background: rgba(16, 23, 26, 0.88);
+  --van-picker-background: #ffffff;
+  --van-picker-option-text-color: #10171a;
+  --van-picker-toolbar-title-color: #10171a;
+}
+
+/* ==================== 深色主题（黑色 / 夜间） ==================== */
+html.dark {
+  --brand: #04dc9c;
+  --brand-2: #4cccf4;
+  --brand-3: #bce4fc;
+  --brand-ink: #05121a;
+  --brand-deep: #2fe0a8;
+  --accent: #4cccf4;
+  --accent-text: #4cccf4;
+  --success: #04dc9c;
+  --danger: #ff6b70;
+  --danger-fill: #c73b40;
+
+  --ink: #0a0a0a;
+  --ink-2: #141414;
+  --olive-900: #1c1c1c;
+  --olive-700: #242424;
+
+  --text: #f2f5f6;
+  --text-2: #9aa3a9;
+  --text-3: #7c858c;
+  --text-4: #5a6165;
+
+  --surface: #161616;
+  --surface-2: #1c1c1c;
+  --bg: #0b0b0b;
+  --bg-2: #101010;
+  --line: #262b2d;
+  --tint: rgba(4, 220, 156, 0.12);
+  --tag-attraction: #bce4fc;
+  --tag-food: #4cccf4;
+  --tag-hotel: #04dc9c;
+
+  --shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 8px 26px rgba(0, 0, 0, 0.55);
+  --glow: 0 6px 22px rgba(4, 220, 156, 0.22);
+
+  --van-primary-color: #04dc9c;
+  --van-danger-color: #e5484d;
+  --van-success-color: #04dc9c;
+  --van-text-color: #f2f5f6;
+  --van-text-color-2: #9aa3a9;
+  --van-text-color-3: #7c858c;
+  --van-background: #0b0b0b;
+  --van-background-2: #161616;
+  --van-border-color: #262b2d;
+  --van-active-color: #1c1c1c;
+
+  --van-nav-bar-background: #0a0a0a;
+  --van-nav-bar-title-text-color: #f2f5f6;
+  --van-nav-bar-icon-color: #f2f5f6;
+  --van-nav-bar-text-color: #04dc9c;
+
+  --van-tabbar-background: #0a0a0a;
+  --van-tabbar-item-text-color: #7c858c;
+  --van-tabbar-item-active-color: #04dc9c;
+
+  --van-button-primary-background: #04dc9c;
+  --van-button-primary-border-color: #04dc9c;
+  --van-button-primary-color: #05121a;
+  --van-button-default-color: #f2f5f6;
+  --van-button-default-background: #1c1c1c;
+  --van-button-default-border-color: #333b3e;
+  --van-button-danger-background: #c73b40;
+  --van-button-danger-border-color: #c73b40;
+
+  --van-cell-background: #161616;
+  --van-cell-text-color: #f2f5f6;
+  --van-cell-value-color: #9aa3a9;
+  --van-cell-border-color: #22262a;
+  --van-field-label-color: #9aa3a9;
+  --van-field-input-text-color: #f2f5f6;
+  --van-field-placeholder-text-color: #5a6165;
+  --van-field-word-limit-color: #8f989e;
+
+  --van-popup-background: #161616;
+  --van-search-content-background: #1c1c1c;
+  --van-loading-spinner-color: #04dc9c;
+  --van-rate-icon-full-color: #4cccf4;
+  --van-tag-primary-color: #2fe0a8;
+  --van-tag-default-color: #242424;
+  --van-notice-bar-background: #161616;
+  --van-notice-bar-text-color: #04dc9c;
+  --van-notice-bar-left-icon-color: #04dc9c;
+  --van-dialog-background: #161616;
+  --van-toast-background: rgba(28, 28, 28, 0.96);
+  --van-picker-background: #161616;
+  --van-picker-option-text-color: #f2f5f6;
+  --van-picker-toolbar-title-color: #f2f5f6;
+}
+
+/* ==================== 基础 ==================== */
+
 * {
   margin: 0;
   padding: 0;
@@ -14,12 +230,15 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #f7f8fa;
-  color: #323233;
+  background-color: var(--bg);
+  color: var(--text);
   font-size: 14px;
   line-height: 1.5;
   min-height: 100%;
   overscroll-behavior-y: none;
+  /* 注意：这里不要给 color/background-color 加 transition。
+     当取值来自 var() 且主题切换时，Chromium 会把颜色卡在过渡起始值（表现为文字变黑、背景透明），
+     因此主题切换采用瞬时生效。 */
 }
 
 #app {
@@ -28,50 +247,140 @@ body {
   margin: 0 auto;
   min-height: 100vh;
   min-height: 100dvh;
-  background-color: #fff;
+  background-color: var(--bg);
   position: relative;
   display: flex;
   flex-direction: column;
 }
 
-/* 路由视图容器 */
+h1, h2, h3 {
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.van-nav-bar__title {
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.van-nav-bar {
+  padding-top: env(safe-area-inset-top);
+}
+
+/* 顶栏描边：浅色用细线，深色用更深的分隔 */
+.van-nav-bar::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--line);
+}
+
+html.dark .van-nav-bar::after {
+  background: #000;
+}
+
+.van-tabbar {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.van-tabbar-item__text {
+  font-weight: 600;
+}
+
+/* 主按钮：青绿→天青渐变 + 近黑字 */
+.van-button--primary {
+  font-weight: 700;
+  background: var(--grad-brand);
+  border: none;
+  color: var(--brand-ink);
+}
+
+.van-button--primary .van-button__text {
+  color: var(--brand-ink);
+}
+
+/* 朴素主色按钮：用强调色文字 */
+.van-button--primary.van-button--plain {
+  background: transparent;
+  color: var(--brand-deep);
+  border: 1px solid var(--brand-deep);
+}
+
+.van-button--primary.van-button--plain .van-button__text {
+  color: var(--brand-deep);
+}
+
+/* 默认按钮：跟随主题面板色（避免 Vant 默认白底在深色下不可见） */
+.van-button--default {
+  background: var(--surface-2);
+  border-color: var(--line);
+  color: var(--text);
+}
+
+.van-button--default.van-button--plain {
+  background: transparent;
+  border-color: var(--line);
+  color: var(--text-2);
+}
+
+/* 危险按钮：填充用深红（白字达标），朴素用主题危险色 */
+.van-button--danger.van-button--plain {
+  background: transparent;
+  border-color: var(--danger);
+}
+
+.van-button--danger.van-button--plain .van-button__text {
+  color: var(--danger);
+}
+
+html.dark .van-button--danger.van-button--plain {
+  border-color: rgba(229, 72, 77, 0.55);
+}
+
+html.dark .van-button--danger.van-button--plain .van-button__text {
+  color: #ff8085;
+}
+
+.van-cell-group--inset {
+  overflow: hidden;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.van-cell-group--inset .van-cell {
+  background: var(--surface);
+}
+
+.van-card {
+  background: var(--surface);
+}
+
 .page-container {
   flex: 1;
   overflow-y: auto;
   padding-bottom: 50px;
 }
 
-/* 底部导航栏安全区域适配 */
-.van-tabbar {
-  padding-bottom: env(safe-area-inset-bottom);
-}
-
-/* 顶部导航栏安全区域适配 */
-.van-nav-bar {
-  padding-top: env(safe-area-inset-top);
-}
-
-/* 禁止文字选中（可选，根据需求调整） */
 .no-select {
   -webkit-user-select: none;
   user-select: none;
 }
 
-/* 清除浮动 */
 .clearfix::after {
   content: '';
   display: table;
   clear: both;
 }
 
-/* 单行省略 */
 .ellipsis {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-/* 多行省略 */
 .ellipsis-2 {
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -79,14 +388,12 @@ body {
   overflow: hidden;
 }
 
-/* 移动端图片自适应 */
 img {
   max-width: 100%;
   height: auto;
   display: block;
 }
 
-/* 目的地选择弹窗宽度与主页面一致 */
 .destination-popup {
   max-width: 750px;
   left: 0;
@@ -95,4 +402,16 @@ img {
   border-top-left-radius: 16px;
   border-top-right-radius: 16px;
   overflow: hidden;
+}
+
+/* 区块小标题：左侧青绿短杠 */
+.section-title-bar::before {
+  content: '';
+  display: inline-block;
+  width: 4px;
+  height: 14px;
+  border-radius: 2px;
+  background: var(--grad-brand);
+  margin-right: 6px;
+  vertical-align: -2px;
 }

@@ -7,7 +7,18 @@
     <meta name="format-detection" content="telephone=no" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="theme-color" content="#f4f7f8" />
     <title>travel</title>
+    <script>
+      // 在首屏渲染前应用已保存主题，避免深色用户看到白色闪屏
+      try {
+        if (localStorage.getItem('travel_theme') === 'dark') {
+          document.documentElement.classList.add('dark', 'van-theme-dark')
+          var m = document.querySelector('meta[name="theme-color"]')
+          if (m) m.setAttribute('content', '#0b0b0b')
+        }
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="app"></div>

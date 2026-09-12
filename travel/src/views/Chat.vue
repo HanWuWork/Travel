@@ -57,7 +57,12 @@
             </template>
           </div>
           <div class="bubble" :class="{ 'bubble--error': item.error }">
-            <template v-if="item.text">{{ item.text }}</template>
+            <!-- AI 回复：渲染为可读排版（加粗/列表/代码），不显示 Markdown 符号 -->
+            <template v-if="item.role === 'assistant' && item.text">
+              <span class="bubble-rich" v-html="renderAiText(item.text)"></span>
+              <span v-if="item.streaming" class="cursor"></span>
+            </template>
+            <template v-else-if="item.text">{{ item.text }}</template>
             <span v-else-if="item.pending" class="thinking">
               正在思考<span class="thinking-dots"><i>.</i><i>.</i><i>.</i></span>
             </span>
@@ -72,6 +77,7 @@
         v-model="inputText"
         class="input-box"
         type="text"
+        maxlength="1000"
         placeholder="请输入你想咨询的问题"
         :disabled="streaming"
         @keyup.enter="sendMessage"
@@ -99,6 +105,7 @@
 import { ref, computed, nextTick, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { streamChat } from '../api/chat'
+import { renderAiText } from '../utils/aiText'
 
 const router = useRouter()
 const onBack = () => router.push('/')
@@ -145,7 +152,7 @@ const sendMessage = async () => {
   if (!text || streaming.value) return
 
   messages.value.push({ id: nextId(), role: 'user', text, pending: false, error: false })
-  const aiMsg = { id: nextId(), role: 'assistant', text: '', pending: true, error: false }
+  const aiMsg = { id: nextId(), role: 'assistant', text: '', pending: true, streaming: false, error: false }
   messages.value.push(aiMsg)
   inputText.value = ''
   streaming.value = true
@@ -157,13 +164,19 @@ const sendMessage = async () => {
     message: text,
     sessionId: sessionId.value,
     signal: abortController.signal,
+    onMeta: (payload) => {
+      // 流建立即拿到 sessionId，后续轮次可直接复用
+      if (payload.sessionId) sessionId.value = payload.sessionId
+    },
     onDelta: (chunk) => {
       aiMsg.pending = false
+      aiMsg.streaming = true
       aiMsg.text += chunk
       scrollToBottom()
     },
     onDone: (payload) => {
       aiMsg.pending = false
+      aiMsg.streaming = false
       if (payload.sessionId) sessionId.value = payload.sessionId
       if (!aiMsg.text) aiMsg.text = '（回复为空，换个问法试试吧～）'
       finishStream()
@@ -171,6 +184,7 @@ const sendMessage = async () => {
     },
     onError: (msg) => {
       aiMsg.pending = false
+      aiMsg.streaming = false
       aiMsg.error = true
       aiMsg.text = msg
       finishStream()
@@ -189,6 +203,7 @@ const stopGenerate = () => {
   const last = messages.value[messages.value.length - 1]
   if (last && last.role === 'assistant') {
     last.pending = false
+    last.streaming = false
     if (!last.text) last.text = '已停止生成。'
   }
   finishStream()
@@ -205,7 +220,7 @@ onUnmounted(() => {
   flex-direction: column;
   flex: 1;
   min-height: 0;
-  background-color: #fff;
+  background-color: var(--bg);
 }
 
 .chat-body {
@@ -235,7 +250,7 @@ onUnmounted(() => {
 .empty-tip {
   margin: 16px 0 32px;
   font-size: 14px;
-  color: #969799;
+  color: var(--text-2);
   letter-spacing: 0.5px;
 }
 
@@ -247,7 +262,7 @@ onUnmounted(() => {
 .faq-title {
   text-align: center;
   font-size: 13px;
-  color: #969799;
+  color: var(--text-2);
   margin-bottom: 14px;
 }
 
@@ -260,9 +275,9 @@ onUnmounted(() => {
 .faq-item {
   padding: 10px 12px;
   font-size: 13px;
-  color: #323233;
+  color: var(--text);
   text-align: center;
-  background-color: #f2f3f5;
+  background-color: var(--line);
   border-radius: 8px;
   cursor: pointer;
   transition: background-color 0.15s;
@@ -270,7 +285,7 @@ onUnmounted(() => {
 }
 
 .faq-item:active {
-  background-color: #e4e5e7;
+  background-color: var(--line);
 }
 
 /* 消息列表 */
@@ -280,7 +295,7 @@ onUnmounted(() => {
   overflow-y: auto;
   padding: 14px 12px 12px;
   -webkit-overflow-scrolling: touch;
-  background-color: #f7f8fa;
+  background-color: var(--surface-2);
 }
 
 .msg-row {
@@ -302,40 +317,83 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
-  background-color: #1989fa;
+  color: var(--brand);
+  background-color: var(--ink);
 }
 
 .msg-row--ai .avatar {
-  background-color: #07c160;
+  background: var(--grad-brand);
+  color: var(--brand-ink);
 }
 
 .bubble {
   max-width: 76%;
   padding: 9px 12px;
   border-radius: 10px;
-  background-color: #fff;
-  color: #323233;
+  background-color: var(--surface);
+  color: var(--text);
   font-size: 14px;
   line-height: 1.6;
   white-space: pre-wrap;
   word-break: break-word;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shadow);
 }
 
 .msg-row--user .bubble {
-  background-color: #1989fa;
-  color: #fff;
+  background: var(--grad-brand);
+  color: var(--brand-ink);
+  font-weight: 600;
 }
 
 .bubble--error {
-  background-color: #fff7f8;
-  color: #ee0a24;
-  border: 1px solid #fde0e4;
+  background-color: var(--surface-2);
+  color: var(--danger);
+  border: 1px solid var(--line);
+}
+
+/* AI 富文本内容（去 Markdown 符号后的排版） */
+.bubble-rich :deep(strong) {
+  font-weight: 700;
+}
+
+.bubble-rich :deep(.ai-code),
+.bubble-rich :deep(.ai-code-inline) {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12.5px;
+  background: var(--surface-2);
+  border-radius: 6px;
+}
+
+.bubble-rich :deep(.ai-code) {
+  display: block;
+  padding: 8px 10px;
+  margin: 6px 0;
+  overflow-x: auto;
+  white-space: pre;
+}
+
+.bubble-rich :deep(.ai-code-inline) {
+  padding: 1px 5px;
+}
+
+/* 流式输出光标 */
+.cursor {
+  display: inline-block;
+  width: 2px;
+  height: 14px;
+  margin-left: 2px;
+  vertical-align: -2px;
+  background: var(--brand-deep);
+  animation: caret 0.9s steps(1) infinite;
+}
+
+@keyframes caret {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
 }
 
 .thinking {
-  color: #969799;
+  color: var(--text-2);
 }
 
 .thinking-dots i {
@@ -356,8 +414,8 @@ onUnmounted(() => {
   align-items: center;
   gap: 8px;
   padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
-  border-top: 1px solid #ebedf0;
-  background-color: #fff;
+  border-top: 1px solid var(--line);
+  background-color: var(--surface);
 }
 
 .input-box {
@@ -365,15 +423,15 @@ onUnmounted(() => {
   height: 36px;
   padding: 0 14px;
   font-size: 14px;
-  color: #323233;
-  background-color: #f2f3f5;
+  color: var(--text);
+  background-color: var(--surface-2);
   border: none;
   border-radius: 18px;
   outline: none;
 }
 
 .input-box::placeholder {
-  color: #c8c9cc;
+  color: var(--text-2);
 }
 
 .input-box:disabled {
@@ -386,8 +444,8 @@ onUnmounted(() => {
   height: 36px;
   border: none;
   border-radius: 50%;
-  background-color: #1989fa;
-  color: #fff;
+  background: var(--grad-brand);
+  color: var(--brand-ink);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -410,7 +468,7 @@ onUnmounted(() => {
   height: 36px;
   border: none;
   border-radius: 50%;
-  background-color: #ee0a24;
+  background-color: var(--danger-fill);
   color: #fff;
   display: flex;
   align-items: center;

@@ -81,7 +81,7 @@ onMounted(loadOrders)
 <style scoped>
 .orders-page {
   min-height: 100vh;
-  background: #f7f8fa;
+  background: var(--bg);
 }
 
 .orders-content {
@@ -101,7 +101,7 @@ onMounted(loadOrders)
 }
 
 .order-card {
-  background: #fff;
+  background: var(--surface);
   border-radius: 10px;
   padding: 14px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
@@ -117,7 +117,7 @@ onMounted(loadOrders)
 .order-dest {
   font-size: 16px;
   font-weight: 600;
-  color: #323233;
+  color: var(--text);
   display: flex;
   align-items: center;
   gap: 4px;
@@ -129,15 +129,15 @@ onMounted(loadOrders)
   border-radius: 10px;
 }
 
-.status-pending { background: #fff7e6; color: #ff9800; }
-.status-completed { background: #e8f7ee; color: #07c160; }
-.status-cancelled { background: #f7f8fa; color: #969799; }
+.status-pending { background: rgba(76, 204, 244, 0.16); color: #4cccf4; }
+.status-completed { background: rgba(4, 220, 156, 0.16); color: #04dc9c; }
+.status-cancelled { background: var(--bg); color: var(--text-2); }
 
 .order-meta {
   display: flex;
   gap: 20px;
   font-size: 13px;
-  color: #646566;
+  color: var(--text-2);
   margin-bottom: 12px;
 }
 
@@ -146,11 +146,11 @@ onMounted(loadOrders)
   justify-content: space-between;
   align-items: center;
   padding-top: 10px;
-  border-top: 1px solid #f2f3f5;
+  border-top: 1px solid var(--line);
 }
 
 .order-time {
   font-size: 12px;
-  color: #969799;
+  color: var(--text-2);
 }
 </style>

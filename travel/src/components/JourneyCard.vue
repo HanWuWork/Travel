@@ -41,10 +41,10 @@
       </template>
       <template #footer>
         <div class="journey-actions">
-          <Button class="action-btn" type="primary" round @click="onStartPlan">
+          <Button class="action-btn action-btn--main" round @click="onStartPlan">
             开始规划
           </Button>
-          <Button class="action-btn" round plain @click="onReset">
+          <Button class="action-btn action-btn--ghost" round @click="onReset">
             重置
           </Button>
         </div>
@@ -157,37 +157,121 @@ const onStartPlan = () => {
 </script>
 
 <style scoped>
+/* 首页主视觉：亮黄大色块 + 近黑字，呼应参考图 */
 .journey-card {
   margin: 12px;
+  border-radius: var(--radius-lg);
+  background: var(--grad-brand);
+  padding: 10px 12px 8px;
+  box-shadow: 0 8px 24px rgba(180, 140, 0, 0.28);
+  position: relative;
+  overflow: hidden;
+}
+
+/* 右上角浅色圆形装饰 */
+.journey-card::after {
+  content: '';
+  position: absolute;
+  right: -28px;
+  top: -28px;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.28);
+  pointer-events: none;
+}
+
+.journey-card :deep(.van-card) {
+  background: transparent;
+  padding: 0;
+  box-shadow: none;
+  border-radius: 0;
 }
 
 .card-title {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 16px;
-  font-weight: 600;
+  gap: 4px;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--brand-ink);
+  position: relative;
+  z-index: 1;
 }
 
 .journey-form {
-  padding: 8px 0;
+  background: var(--surface);
+  border-radius: 14px;
+  padding: 6px 14px;
+  margin: 10px 0 4px;
+  position: relative;
+  z-index: 1;
+  /* 中间表单区占卡片主体：Field 基于 Cell，行高由 cell 内边距变量控制 */
+  --van-field-vertical-padding: 15px;
+  --van-cell-vertical-padding: 15px;
+  --van-field-label-color: var(--text-2);
+}
+
+/* 显式设置每行输入高度，不依赖变量名，避免 Vant 版本差异 */
+.journey-form :deep(.van-field.van-cell) {
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+
+/* 输入文字/标签：略小于上一步，配合整体缩小 */
+.journey-form :deep(.van-field__label) {
+  font-size: 14.5px;
+  line-height: 22px;
+}
+
+.journey-form :deep(.van-field__control) {
+  font-size: 15px;
+  line-height: 22px;
+  min-height: 22px;
+}
+
+.journey-form :deep(.van-field__body) {
+  min-height: 22px;
+}
+
+/* 输入内容用主题文字色并加粗，未填写时保持占位色 */
+.journey-form :deep(input.van-field__control) {
+  font-weight: 600;
+  color: var(--text);
 }
 
 .field-suffix {
-  color: #969799;
-  font-size: 14px;
+  color: var(--text-2);
+  font-size: 13px;
 }
 
 .journey-actions {
   display: flex;
   justify-content: center;
-  gap: 12px;
-  padding: 4px 0;
+  gap: 10px;
+  padding: 6px 0 2px;
+  position: relative;
+  z-index: 1;
 }
 
 .action-btn {
   flex: 1;
-  height: 44px;
-  font-size: 16px;
+  height: 34px;
+  font-size: 13.5px;
+  border: none;
+}
+
+/* 深色主按钮 + 黄色文字，在黄底上对比最强 */
+.journey-card :deep(.action-btn--main) {
+  background: var(--ink);
+  color: var(--brand);
+  font-weight: 700;
+}
+
+.journey-card :deep(.action-btn--ghost) {
+  background: rgba(20, 20, 0, 0.06);
+  color: var(--brand-ink);
+  border: 1.5px solid rgba(20, 20, 0, 0.35);
+  font-weight: 700;
 }
 </style>

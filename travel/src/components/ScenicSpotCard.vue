@@ -3,39 +3,41 @@
     <Card>
       <template #title>
         <div class="card-title">
-          <Icon name="fire-o" />
+          <Icon name="fire-o" class="card-title__icon" />
           <span>热门景点</span>
+          <span class="card-title__hint">左右滑动查看</span>
         </div>
       </template>
       <template #desc>
-        <div
-          v-for="(spot, index) in spots"
-          :key="spot.id"
-          class="spot-item"
-          :class="{ 'spot-item--last': index === spots.length - 1 }"
-          @click="$emit('select', spot)"
-        >
-          <div class="spot-cover">
-            <Image
+        <Empty v-if="!spots.length" description="暂无推荐景点" image-size="60" />
+        <div v-else class="spot-scroll">
+          <div
+            v-for="spot in spots"
+            :key="spot.id"
+            class="spot-card"
+            @click="$emit('select', spot)"
+          >
+            <!-- 景区图片；加载失败时回退为渐变占位（本地资源，直接加载） -->
+            <img
+              v-if="spot.image && !failed[spot.id]"
+              class="spot-card__img"
               :src="spot.image"
-              width="120px"
-              height="90px"
-              fit="cover"
-              radius="8px"
+              :alt="spot.name"
+              decoding="async"
+              @error="onError(spot.id)"
             />
-            <div class="spot-tag">{{ spot.tag }}</div>
-          </div>
-          <div class="spot-content">
-            <div class="spot-title">
-              <span class="spot-name">{{ spot.name }}</span>
-              <span class="spot-rating">
-                <Icon name="good-job-o" /> {{ spot.rating }}
-              </span>
-            </div>
-            <div class="spot-desc ellipsis-2">{{ spot.description }}</div>
-            <div class="spot-footer">
-              <span class="spot-price">¥{{ spot.price }}<span class="price-unit">起</span></span>
-              <Icon name="arrow" class="arrow-icon" />
+            <div v-else class="spot-card__ph">{{ (spot.name || '景').slice(0, 1) }}</div>
+
+            <div class="spot-card__tag">{{ spot.tag }}</div>
+
+            <div class="spot-card__mask">
+              <div class="spot-card__name">{{ spot.name }}</div>
+              <div class="spot-card__meta">
+                <span v-if="spot.cityName" class="spot-card__city">{{ spot.cityName }}</span>
+                <span v-if="spot.rating" class="spot-card__rating">
+                  <Icon name="good-job-o" /> {{ spot.rating }}
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -45,44 +47,23 @@
 </template>
 
 <script setup>
-import { Card, Icon, Image } from 'vant'
+import { reactive } from 'vue'
+import { Card, Empty, Icon } from 'vant'
 
+/**
+ * 热门景点：横向滚动的图片卡片
+ * spots 由父组件传入（来自 /api/dest/hot-spots 的真实数据），
+ * 保证「展示的景点」与「点击后打开的详情」是同一条记录。
+ */
 defineProps({
-  spots: {
-    type: Array,
-    default: () => [
-      {
-        id: 1,
-        name: '西湖风景区',
-        description: '杭州著名景点，湖光山色美不胜收',
-        image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=%E6%9D%AD%E5%B7%9E%E8%A5%BF%E6%B9%96%E9%A3%8E%E6%99%AF%EF%BC%8C%E5%A4%96%E6%B1%AD%E6%98%8E%E6%9F%B3%E6%98%A0%E6%9C%88%EF%BC%8C%E5%8F%A4%E5%85%B8%E4%BA%AD%E5%8F%B0%EF%BC%8C%E8%BF%9C%E5%B1%B1%E5%A6%82%E7%94%BB%EF%BC%8C%E6%B8%85%E6%99%A8%E5%BE%AE%E9%9B%A8%EF%BC%8C%E9%AB%98%E8%80%83%E5%86%99%E5%AE%9E%E6%91%84%E5%BD%B1&image_size=landscape_4_3',
-        price: 80,
-        rating: '4.9',
-        tag: '热门'
-      },
-      {
-        id: 2,
-        name: '故宫博物院',
-        description: '北京明清两代皇家宫殿，世界文化遗产',
-        image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=%E5%8C%97%E4%BA%AC%E6%95%85%E5%AE%AB%E5%8D%9A%E7%89%A9%E9%99%A2%EF%BC%8C%E7%BA%A2%E5%A2%99%E9%BB%84%E7%93%A6%EF%BC%8C%E4%B8%87%E5%A6%84%E6%97%A7%E5%AD%90%EF%BC%8C%E9%87%91%E5%9F%8E%E7%9A%87%E5%AE%AB%EF%BC%8C%E9%98%B3%E5%85%89%E8%BE%89%E7%85%A7%EF%BC%8C%E4%B8%AD%E5%A4%AE%E5%A4%AA%E5%92%8C%E6%AE%BF%EF%BC%8C%E9%AB%98%E8%80%83%E5%86%99%E5%AE%9E%E6%91%84%E5%BD%B1&image_size=landscape_4_3',
-        price: 60,
-        rating: '4.8',
-        tag: '必去'
-      },
-      {
-        id: 3,
-        name: '张家界国家森林公园',
-        description: '奇峰异石，云雾缭绕，自然风光壮丽',
-        image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=%E5%BC%A0%E5%AE%B6%E7%95%8C%E5%9B%BD%E5%AE%B6%E6%A3%AE%E6%9E%97%E5%85%AC%E5%9B%AD%EF%BC%8C%E5%A5%87%E5%B3%B0%E5%BC%82%E7%9F%B3%EF%BC%8C%E4%BA%91%E6%B5%AE%E7%BC%95%E7%BB%95%EF%BC%8C%E7%AB%B9%E5%AD%90%E8%87%AA%E6%92%92%E7%9A%84%E7%9F%B3%E5%B3%B0%EF%BC%8C%E7%BB%BF%E8%89%B2%E6%A3%AE%E6%9E%97%EF%BC%8C%E9%98%B3%E5%85%89%E4%B8%8B%E5%8D%8A%E5%B1%B1%E4%BA%91%E6%B5%B7%EF%BC%8C%E9%AB%98%E8%80%83%E5%86%99%E5%AE%9E%E6%91%84%E5%BD%B1&image_size=landscape_4_3',
-        price: 228,
-        rating: '4.7',
-        tag: '推荐'
-      }
-    ]
-  }
+  spots: { type: Array, default: () => [] }
 })
 
 defineEmits(['select'])
+
+/** 记录加载失败的图片 id，回退为渐变占位 */
+const failed = reactive({})
+const onError = (id) => { failed[id] = true }
 </script>
 
 <style scoped>
@@ -98,90 +79,127 @@ defineEmits(['select'])
   font-weight: 600;
 }
 
-.spot-item {
+.card-title__icon {
+  color: var(--brand-deep);
+}
+
+.card-title__hint {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-3);
+}
+
+/* 横向滚动容器：卡片向左溢出，右侧露出下一张的一部分 */
+.spot-scroll {
   display: flex;
   gap: 12px;
-  padding: 12px 0;
-  border-bottom: 1px solid #f2f3f5;
-  cursor: pointer;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 4px 2px 8px;
+  margin: 0 -4px;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
 }
 
-.spot-item--last {
-  border-bottom: none;
+.spot-scroll::-webkit-scrollbar {
+  display: none;
 }
 
-.spot-cover {
+/* 单张图片卡片：宽度约 68%，形成「下一张露一角」的效果 */
+.spot-card {
   position: relative;
-  flex-shrink: 0;
+  flex: 0 0 68%;
+  max-width: 300px;
+  height: 168px;
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  scroll-snap-align: start;
+  background: var(--surface-2);
+  box-shadow: var(--shadow);
+  transition: transform 0.18s ease;
 }
 
-.spot-tag {
-  position: absolute;
-  top: 4px;
-  left: 4px;
-  background: linear-gradient(135deg, #ff7043, #ff5252);
-  color: white;
-  font-size: 11px;
-  padding: 1px 6px;
-  border-radius: 4px;
+.spot-card:active {
+  transform: scale(0.98);
 }
 
-.spot-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  min-width: 0;
+.spot-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
-.spot-title {
+/* 无图占位 */
+.spot-card__ph {
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+  font-size: 44px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.9);
+  background: linear-gradient(135deg, #2ba6d8, #04c489);
 }
 
-.spot-name {
-  font-size: 15px;
+.spot-card__tag {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  padding: 1px 8px;
+  border-radius: 8px;
+  font-size: 11px;
   font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, #e5484d, #c73b40);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+}
+
+/* 底部渐变遮罩 + 文字，保证图片上文字可读 */
+.spot-card__mask {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 22px 10px 9px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.78) 0%, rgba(0, 0, 0, 0.45) 45%, rgba(0, 0, 0, 0) 100%);
+  color: #fff;
+}
+
+.spot-card__name {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.3;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.spot-rating {
+.spot-card__meta {
   display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 3px;
+  font-size: 11px;
+  opacity: 0.92;
+}
+
+.spot-card__city {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.spot-card__rating {
+  display: inline-flex;
   align-items: center;
   gap: 2px;
-  font-size: 13px;
-  color: #ffb300;
   flex-shrink: 0;
-}
-
-.spot-desc {
-  font-size: 13px;
-  color: #969799;
-  margin: 4px 0;
-}
-
-.spot-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.spot-price {
-  color: #ee0a24;
-  font-size: 18px;
+  color: #ffd88a;
   font-weight: 600;
-}
-
-.price-unit {
-  font-size: 12px;
-  font-weight: 400;
-}
-
-.arrow-icon {
-  color: #c8c9cc;
-  font-size: 14px;
 }
 </style>
